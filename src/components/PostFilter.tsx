@@ -1,4 +1,4 @@
-import { useSearchParams } from "react-router-dom";
+import {Link, useSearchParams} from "react-router-dom";
 
 import classNames from 'classnames';
 import React, { useState } from 'react';
@@ -126,24 +126,31 @@ export const PostFilter = () => {
 
       <div className="buttons">
         {'aeoui'.split('').map(letter => (
-          <button
+          <Link
             key={letter}
-            onClick={() => toggleLetter(letter)}
+            to={{ search: getSearchWith({
+                letters: letters.includes(letter)
+                    ? letters.filter(ch => letter !== ch)
+                    : [...letters, letter]
+            }, searchParams),
+            }}
+            // onClick={() => toggleLetter(letter)}
             className={classNames('button', {
               'is-info': letters.includes(letter),
             })}
           >
             {letter}
-          </button>
+          </Link>
         ))}
 
-        <button
+        <Link
+            to={{ search: getSearchWith({letters: null}, searchParams) }}
           onClick={clearLetters}
           className="button"
-          disabled={letters.length === 0}
+          // disabled={letters.length === 0}
         >
           Clear
-        </button>
+        </Link>
       </div>
     </div>
   )
