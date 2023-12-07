@@ -4,6 +4,26 @@ import classNames from 'classnames';
 import React, { useState } from 'react';
 import { useUsers } from '../store/UsersContext';
 
+type Param = string | number;
+type Params = {
+  [key: string]: Param[] | Param | null;
+}
+
+function getSearchWith(params: Params, search?: string | URLSearchParams) {
+  const newParams = new URLSearchParams(search); // если не пустой перелдаем все значения  из URLSearchParams
+
+  for (const [key, value] of Object.entries(params)) {  //перебираем все ключи изначения новых params:
+    if (value === null) {// если ноль удаляем
+      newParams.delete(key);
+    } else if (Array.isArray(value)) {// если массив то удаляем
+      newParams.delete(key);
+      value.forEach(item => newParams.append(key, item.toString()))//делае апенд чтоб добавить несколько значений
+    } else {
+      newParams.set(key, value.toString());// во всех других случяях устанавлтваем одно значение
+    }
+  }
+  return newParams.toString();// возвращяем  строку
+}
 export const PostFilter = () => {
   const [searchParams, setSearchParams] = useSearchParams(); //useSearchParams() беретс с адреса
   const users = useUsers();
@@ -16,21 +36,36 @@ export const PostFilter = () => {
   // const [userId, setUserId] = useState(0);
   // const [letters, setLetters] = useState<string[]>([]);
 
+  //  создали в 3 уроке
+  function setSearchWith(params: any) {
+    // const newParams = new URLSearchParams(searchParams);
+
+    const search = getSearchWith(params, searchParams)
+    // setSearchParams(newParams);
+    setSearchParams(search);
+  }
+
   function handlePageChange(event: React.ChangeEvent<HTMLSelectElement>) {
     // setUserId(+event.target.value);
 
-    const params = new URLSearchParams(searchParams); //сохранили преыдущие параметры
-    params.set('userId', event.target.value); // и ддобавли с ключем х
-    setSearchParams(params);
+    //  измиенили в 3 уроке
+    // const params = new URLSearchParams(searchParams); //сохранили преыдущие параметры
+    //params.set('userId', event.target.value); // и ддобавли с ключем х
+    //setSearchParams(params);
+
+    setSearchWith({userId: +event.target.value || null});
   }
 
   function handleQueryChange(event: React.ChangeEvent<HTMLInputElement>) {
     // setQuery(event.target.value);
     // setSearchParams(`?query=${event.target.value}`);
-    const params = new URLSearchParams(searchParams); //сохранили преыдущие параметры
-    params.set('query', event.target.value); // и ддобавли с ключем х
-    setSearchParams(params);
 
+    //  измиенили в 3 уроке
+    // const params = new URLSearchParams(searchParams); //сохранили преыдущие параметры
+    // params.set('query', event.target.value); // и ддобавли с ключем х
+    // setSearchParams(params);
+
+    setSearchWith({query: +event.target.value || null});
   }
 
   function toggleLetter(ch: string) {
@@ -38,24 +73,31 @@ export const PostFilter = () => {
     //   ? currentLetters.filter(letter => letter !== ch)
     //   : [...currentLetters, ch]
     // );
-    const params = new URLSearchParams(searchParams); //сохранили преыдущие параметры
-    const newLetters = letters.includes(ch) // проверяем есть ли эта буква
-        // если есть удаляем
-    ? letters.filter(letter => letter !== ch)// оставляем только буквы те которые не совпавют с текущими
+    //const params = new URLSearchParams(searchParams); //сохранили преыдущие параметры
+    // проверяем есть ли эта буква
+    const newLetters = letters.includes(ch)
+       ? letters.filter(letter => letter !== ch)// оставляем только буквы те которые не совпавют с текущими
         // если нет добавляем
         : [...letters, ch];// иначе все буквы плюс текущяя
 
-    params.delete('letters'); // удаляем все значения
+    //  измиенили в 3 уроке
+    //params.delete('letters'); // удаляем все значения
     // перебираем вс ебуквы и обавляем их в адрес
-    newLetters.forEach(letter => params.append('letters', letter)); //  ch   текущий символ
-    setSearchParams(params);// в конце записываем в адрес
+    //newLetters.forEach(letter => params.append('letters', letter)); //  ch   текущий символ
+    //setSearchParams(params);// в конце записываем в адрес
+
+    setSearchWith({letters: newLetters});
   }
 
   function clearLetters() {
     // setLetters([]);
-    const params = new URLSearchParams(searchParams); //сохранили преыдущие параметры
-    params.delete('letters'); // и ддобавли с ключем х
-    setSearchParams(params);
+
+    //  измиенили в 3 уроке
+    //  const params = new URLSearchParams(searchParams); //сохранили преыдущие параметры
+    //  params.delete('letters'); // и ддобавли с ключем х
+    //   setSearchParams(params);
+
+    setSearchWith({ letters: null });
   }
 
   return (
