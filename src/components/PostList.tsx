@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import React from 'react';
 import { Post } from '../types';
 import classNames from 'classnames';
@@ -9,6 +9,7 @@ type Props = {
 };
 
 export const PostList: React.FC<Props> = (({ posts, onDelete = () => {} }) => {
+    const [searchParams] = useSearchParams(); // будем использовать когда делаем переход
   const selectedPostId = 0;
 
   return (
@@ -22,11 +23,11 @@ export const PostList: React.FC<Props> = (({ posts, onDelete = () => {} }) => {
           <th></th>
         </tr>
       </thead>
-  
+
       <tbody>
         {posts.map(post => (
-          <tr 
-            key={post.id} 
+          <tr
+            key={post.id}
             className={classNames({
               'has-background-info': selectedPostId === post.id,
             })}
@@ -36,11 +37,13 @@ export const PostList: React.FC<Props> = (({ posts, onDelete = () => {} }) => {
             <td>{post.body}</td>
 
             <td>
-              <Link to={`${post.id}`} className="icon button is-inverted is-info">
+              <Link to={`${post.id}`}
+                  state={{search: searchParams.toString() }}
+                    className="icon button is-inverted is-info">
                 <i className="fas fa-pen"></i>
               </Link>
             </td>
-            
+
             <td>
               <button
                 className="icon button is-inverted is-danger"
